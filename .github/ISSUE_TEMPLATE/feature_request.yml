@@ -1,0 +1,21 @@
+name: Предложение / Feature request
+description: Предложить изменение Zent / Suggest a change to Zent
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Задача / Problem
+      description: Какую задачу нужно решить / What problem should be solved
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Предложение / Proposal
+      description: Ожидаемое поведение или возможное решение / Expected behavior or a possible solution
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Примеры и ссылки / Examples and references

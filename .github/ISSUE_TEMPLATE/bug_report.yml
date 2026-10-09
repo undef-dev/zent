@@ -1,0 +1,38 @@
+name: Ошибка / Bug report
+description: Сообщить об ошибке в Zent / Report a bug in Zent
+body:
+  - type: textarea
+    id: actual
+    attributes:
+      label: Что произошло / What happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Как воспроизвести / Steps to reproduce
+      description: Минимальный пример кода или последовательность действий / Minimal code example or steps
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемый результат / Expected behavior
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Версия и среда / Version and environment
+      description: Версия Zent или коммит, ОС и версия Rust / Zent version or commit, OS, and Rust version
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Логи и подробности / Logs and details
+      description: Если нужны для воспроизведения / If useful for reproducing the issue

@@ -1,0 +1,18 @@
+[package]
+name = "zent-bigram"
+version = "0.0.3"
+description = "A character-level bigram language model and CLI"
+edition = "2024"
+license-file = "../../LICENSE.md"
+repository = "https://github.com/undef-dev/zent"
+default-run = "zent"
+
+[lib]
+name = "zent_bigram"
+path = "src/lib.rs"
+
+[[bin]]
+name = "zent"
+path = "src/main.rs"
+
+[dependencies]
