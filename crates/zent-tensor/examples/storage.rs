@@ -11,9 +11,9 @@ fn main() {
     // Передаём владение вектором хранилищу
     let mut storage = Storage::from_vec(values);
 
-    println!("Количество элементов: {}", storage.len());
-    println!("Хранилище пустое: {}", storage.is_empty());
-    println!("До изменения: {:?}", storage.as_slice());
+    println!("Number of elements: {}", storage.len());
+    println!("Storage is empty: {}", storage.is_empty());
+    println!("Before modification: {:?}", storage.as_slice());
 
     {
         let elements = storage.as_mut_slice();
@@ -24,5 +24,5 @@ fn main() {
         }
     }
 
-    println!("После изменения: {:?}", storage.as_slice());
+    println!("After modification: {:?}", storage.as_slice());
 }

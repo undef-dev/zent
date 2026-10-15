@@ -12,16 +12,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut tensor = Tensor::new(shape, storage)?;
 
-    println!("Форма: {:?}", tensor.shape().dims());
-    println!("Шаги по осям: {:?}", tensor.strides().as_slice());
-    println!("Количество осей: {}", tensor.rank());
-    println!("Количество элементов: {}", tensor.numel());
-    println!("Тензор пустой: {}", tensor.is_empty());
-    println!("До изменения: {:?}", tensor.as_slice());
+    println!("Shape: {:?}", tensor.shape().dims());
+    println!("Strides: {:?}", tensor.strides().as_slice());
+    println!("Rank: {}", tensor.rank());
+    println!("Number of elements: {}", tensor.numel());
+    println!("Tensor is empty: {}", tensor.is_empty());
+    println!("Before modification: {:?}", tensor.as_slice());
+    println!("get([1, 1]): {:?}", tensor.get(&[1, 1]));
+    println!("tensor[[1, 1]]: {}", tensor[[1, 1]]);
+    println!("get([0, 3]): {:?}", tensor.get(&[0, 3]));
 
-    tensor.as_mut_slice()[4] = 50.0;
+    *tensor
+        .get_mut(&[1, 1])
+        .expect("coordinates [1, 1] are valid for shape [2, 3]") = 50.0;
 
-    println!("После изменения: {:?}", tensor.as_slice());
+    println!("After get_mut: {:?}", tensor.as_slice());
+    println!("tensor[[1, 1]]: {}", tensor[[1, 1]]);
+
+    tensor[[1, 1]] = 500.0;
+    println!("After indexed assignment: {:?}", tensor.as_slice());
+    println!("get([1, 1]): {:?}", tensor.get(&[1, 1]));
+
+    let mut scalar = Tensor::from_vec(Shape::new(vec![])?, vec![42.0_f32])?;
+    println!("Scalar at []: {:?}", scalar.get(&[]));
+
+    *scalar.get_mut(&[]).expect("a scalar has one element") = 99.0;
+    println!("Scalar after modification: {:?}", scalar.get(&[]));
+    println!("scalar[[]]: {}", scalar[[]]);
+
+    scalar[[]] = 123.0;
+    println!("Scalar after indexed assignment: {}", scalar[[]]);
 
     Ok(())
 }
