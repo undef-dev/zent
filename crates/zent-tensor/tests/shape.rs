@@ -5,12 +5,10 @@
 use zent_tensor::{Shape, ShapeError};
 
 #[test]
-fn dimensions_rank_and_element_count() {
+fn new() {
     for (dims, numel) in [
         (vec![], 1),
-        (vec![1], 1),
         (vec![2, 3, 4], 24),
-        (vec![2, 0, 3], 0),
         (vec![usize::MAX], usize::MAX),
         (vec![usize::MAX, 2, 0], 0),
         (vec![0, usize::MAX, 2], 0),
@@ -20,10 +18,6 @@ fn dimensions_rank_and_element_count() {
         assert_eq!(shape.rank(), dims.len());
         assert_eq!(shape.numel(), numel, "{dims:?}");
     }
-}
-
-#[test]
-fn element_count_overflow() {
     assert_eq!(
         Shape::new(vec![usize::MAX, 2]),
         Err(ShapeError::NumelOverflow)

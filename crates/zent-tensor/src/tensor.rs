@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::Storage;
+use crate::scalar::{
+    ArithmeticError, Scalar, ScalarAdd, ScalarDiv, ScalarMul, ScalarNeg, ScalarSub,
+};
 use crate::shape::Shape;
 use crate::strides::{Strides, StridesError};
 use std::error::Error;
@@ -18,15 +21,6 @@ pub struct Tensor<T> {
 
 impl<T> Tensor<T> {
     /// Создаёт тензор из формы и хранилища
-    ///
-    /// Принимает форму и хранилище во владение без копирования элементов
-    /// Проверяет число элементов и вычисляет шаги по осям
-    ///
-    /// # Errors
-    ///
-    /// Возвращает [`TensorError`], если:
-    /// - число элементов хранилища не соответствует форме
-    /// - шаг по оси не помещается в `usize`
     pub fn new(shape: Shape, storage: Storage<T>) -> Result<Self, TensorError> {
         let expected = shape.numel();
         let actual = storage.len();
@@ -157,22 +151,170 @@ impl<T, const N: usize> IndexMut<[usize; N]> for Tensor<T> {
     }
 }
 
-impl Tensor<f32> {
+/// Поэлементные операции
+impl<T: Copy> Tensor<T> {
+    /// Возвращает новый тензор с поэлементной суммой
+    pub fn try_add(&self, rhs: &Self) -> Result<Self, TensorError>
+    where
+        T: ScalarAdd,
+    {
+        let _ = rhs;
+        todo!()
+    }
+
+    /// Поэлементно прибавляет правый тензор к текущему
+    pub fn try_add_assign(&mut self, rhs: &Self) -> Result<(), TensorError>
+    where
+        T: ScalarAdd,
+    {
+        let _ = rhs;
+        todo!()
+    }
+
+    /// Записывает поэлементную сумму в готовый тензор
+    pub fn try_add_into(&self, rhs: &Self, output: &mut Self) -> Result<(), TensorError>
+    where
+        T: ScalarAdd,
+    {
+        let _ = rhs;
+        let _ = output;
+        todo!()
+    }
+
+    /// Возвращает новый тензор с поэлементной разностью
+    pub fn try_sub(&self, rhs: &Self) -> Result<Self, TensorError>
+    where
+        T: ScalarSub,
+    {
+        let _ = rhs;
+        todo!()
+    }
+
+    /// Поэлементно вычитает правый тензор из текущего
+    pub fn try_sub_assign(&mut self, rhs: &Self) -> Result<(), TensorError>
+    where
+        T: ScalarSub,
+    {
+        let _ = rhs;
+        todo!()
+    }
+
+    /// Записывает поэлементную разность в готовый тензор
+    pub fn try_sub_into(&self, rhs: &Self, output: &mut Self) -> Result<(), TensorError>
+    where
+        T: ScalarSub,
+    {
+        let _ = rhs;
+        let _ = output;
+        todo!()
+    }
+
+    /// Возвращает новый тензор с поэлементным произведением
+    pub fn try_mul(&self, rhs: &Self) -> Result<Self, TensorError>
+    where
+        T: ScalarMul,
+    {
+        let _ = rhs;
+        todo!()
+    }
+
+    /// Поэлементно умножает текущий тензор на правый
+    pub fn try_mul_assign(&mut self, rhs: &Self) -> Result<(), TensorError>
+    where
+        T: ScalarMul,
+    {
+        let _ = rhs;
+        todo!()
+    }
+
+    /// Записывает поэлементное произведение в готовый тензор
+    pub fn try_mul_into(&self, rhs: &Self, output: &mut Self) -> Result<(), TensorError>
+    where
+        T: ScalarMul,
+    {
+        let _ = rhs;
+        let _ = output;
+        todo!()
+    }
+
+    /// Возвращает новый тензор с поэлементным частным
+    pub fn try_div(&self, rhs: &Self) -> Result<Self, TensorError>
+    where
+        T: ScalarDiv,
+    {
+        let _ = rhs;
+        todo!()
+    }
+
+    /// Поэлементно делит текущий тензор на правый
+    pub fn try_div_assign(&mut self, rhs: &Self) -> Result<(), TensorError>
+    where
+        T: ScalarDiv,
+    {
+        let _ = rhs;
+        todo!()
+    }
+
+    /// Записывает поэлементное частное в готовый тензор
+    pub fn try_div_into(&self, rhs: &Self, output: &mut Self) -> Result<(), TensorError>
+    where
+        T: ScalarDiv,
+    {
+        let _ = rhs;
+        let _ = output;
+        todo!()
+    }
+
+    /// Возвращает новый тензор, прибавляя число к каждому элементу
+    pub fn add_scalar(&self, value: T) -> Result<Self, TensorError>
+    where
+        T: ScalarAdd,
+    {
+        let _ = value;
+        todo!()
+    }
+
+    /// Возвращает новый тензор, умножая каждый элемент на число
+    pub fn mul_scalar(&self, value: T) -> Result<Self, TensorError>
+    where
+        T: ScalarMul,
+    {
+        let _ = value;
+        todo!()
+    }
+
+    /// Возвращает новый тензор с изменёнными знаками элементов
+    pub fn negated(&self) -> Result<Self, TensorError>
+    where
+        T: ScalarNeg,
+    {
+        todo!()
+    }
+}
+
+impl<T: Scalar> Tensor<T> {
     /// Создаёт тензор заданной формы, заполненный нулями
     pub fn zeros(shape: Shape) -> Result<Self, TensorError> {
-        let values = vec![0.0; shape.numel()];
+        let values = vec![T::ZERO; shape.numel()];
         Self::new(shape, Storage::from_vec(values))
     }
 
     /// Создаёт тензор заданной формы, заполненный единицами
     pub fn ones(shape: Shape) -> Result<Self, TensorError> {
-        let values = vec![1.0; shape.numel()];
+        let values = vec![T::ONE; shape.numel()];
         Self::new(shape, Storage::from_vec(values))
     }
 }
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum TensorError {
+    /// Арифметическая ошибка элемента с линейным индексом
+    Arithmetic {
+        index: usize,
+        source: ArithmeticError,
+    },
+    /// Формы тензоров не совпадают
+    ShapeMismatch { left: Shape, right: Shape },
     /// Число элементов хранилища не соответствует форме
     ElementCountMismatch { expected: usize, actual: usize },
     /// Не удалось вычислить шаги
@@ -185,11 +327,23 @@ impl From<StridesError> for TensorError {
     }
 }
 
-impl Error for TensorError {}
+impl Error for TensorError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Arithmetic { source, .. } => Some(source),
+            Self::Strides(error) => Some(error),
+            _ => None,
+        }
+    }
+}
 
 impl fmt::Display for TensorError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::Arithmetic { index, .. } => {
+                write!(formatter, "arithmetic error at element {index}")
+            }
+
             Self::ElementCountMismatch { expected, actual } => {
                 write!(
                     formatter,
@@ -197,8 +351,17 @@ impl fmt::Display for TensorError {
                 )
             }
 
-            Self::Strides(error) => {
-                write!(formatter, "strides error: {error}")
+            Self::Strides(_) => {
+                write!(formatter, "failed to compute tensor strides")
+            }
+
+            Self::ShapeMismatch { left, right } => {
+                write!(
+                    formatter,
+                    "tensor shapes do not match: {:?} and {:?}",
+                    left.dims(),
+                    right.dims()
+                )
             }
         }
     }

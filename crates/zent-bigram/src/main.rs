@@ -2,17 +2,14 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
-mod cli;
+mod args;
 
-use cli::{CliArgs, CliArgsError, usage};
+use args::{CliArgs, CliArgsError, usage};
 use std::env;
 use std::error::Error;
 use std::fs;
 use std::io::{self, Write};
-use zent_bigram::bigram::{BigramStats, BigramStatsError};
-use zent_bigram::model::BigramModel;
-use zent_bigram::rng::Rng;
-use zent_bigram::tokenizer::{CharTokenizer, TokenId};
+use zent_bigram::{BigramModel, BigramStats, BigramStatsError, CharTokenizer, Rng, TokenId};
 
 fn main() {
     match CliArgs::parse(env::args().skip(1)) {
@@ -34,7 +31,7 @@ fn main() {
     }
 }
 
-/// Запускает основной конвейер языковой модели с готовыми аргументами командной строки
+/// Обучает модель и генерирует текст по аргументам запуска
 fn run(cli_args: CliArgs) -> Result<(), Box<dyn Error>> {
     let text = match (cli_args.train, cli_args.text) {
         (Some(path), _) => fs::read_to_string(path)?,
@@ -127,7 +124,7 @@ fn print_bigram_stats(
     Ok(())
 }
 
-/// Читает строку из стандартного потока ввода
+/// Читает строку из stdin
 #[allow(dead_code)]
 fn text_from_input() -> Result<String, io::Error> {
     let mut input_str = String::new();

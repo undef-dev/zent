@@ -2,12 +2,12 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
-//! Реализует разбор аргументов командной строки
+//! Аргументы командной строки
 
 use std::error::Error;
 use std::path::PathBuf;
 
-/// Структура для хранения разобранных аргументов
+/// Аргументы запуска
 #[derive(Debug, PartialEq, Eq)]
 pub struct CliArgs {
     pub text: Option<String>,
@@ -82,7 +82,7 @@ impl CliArgs {
     }
 }
 
-// Получает следующее значение аргумента, если оно существует и не является именованным аргументом
+/// Читает значение аргумента; другой ключ не считается значением
 fn next_value(
     args: &mut std::iter::Peekable<impl Iterator<Item = String>>,
     name: &'static str,
@@ -96,13 +96,13 @@ fn next_value(
     Ok(value)
 }
 
-// Проверяет, что обязательный аргумент был передан, иначе возвращает ошибку
+/// Проверяет наличие обязательного аргумента
 #[allow(dead_code)]
 fn required_arg<T>(value: Option<T>, name: &'static str) -> Result<T, CliArgsError> {
     value.ok_or(CliArgsError::MissingArg(name))
 }
 
-// Возвращает строку с инструкцией по использованию программы
+/// Возвращает справку CLI
 pub fn usage() -> &'static str {
     "\
 Zent
@@ -133,34 +133,32 @@ Options:
 "
 }
 
-/// Ошибка разбора аргументов командной строки
+/// Ошибка аргументов CLI
 #[derive(Debug, PartialEq, Eq)]
 pub enum CliArgsError {
+    /// Недопустимое значение
     InvalidValue {
         value: String,
         arg: &'static str,
         expected: &'static str,
     },
 
-    /// Обязательный именованный аргумент не передан
+    /// Нет обязательного аргумента
     MissingArg(&'static str),
 
-    /// После имени аргумента отсутствует его значение
+    /// Нет значения аргумента
     MissingValue(&'static str),
 
-    /// Передан неизвестный именованный аргумент
+    /// Неизвестный аргумент
     UnknownArg(String),
 
-    /// Пользователь запросил справку вместо запуска
+    /// Запрошена справка
     Usage,
 }
 
-/// Реализует `Error`, чтобы `CliArgsError` можно было возвращать через `Result`
 impl Error for CliArgsError {}
 
-/// Реализует `Display` для понятного вывода ошибок
 impl std::fmt::Display for CliArgsError {
-    /// Форматирует ошибку разбора аргументов для отображения пользователю
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::InvalidValue {
@@ -190,128 +188,5 @@ impl std::fmt::Display for CliArgsError {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn parse(args: &[&str]) -> Result<CliArgs, CliArgsError> {
-        CliArgs::parse(args.iter().map(|arg| arg.to_string()))
-    }
-
-    #[test]
-    fn parses_text() {
-        let args = parse(&["--text", "abba"]).unwrap();
-
-        assert_eq!(args.text, Some("abba".to_string()));
-        assert_eq!(args.train, None);
-    }
-
-    #[test]
-    fn parses_empty_text() {
-        let args = parse(&["--text"]).unwrap();
-
-        assert_eq!(args.text, Some(String::new()));
-    }
-
-    #[test]
-    fn parses_train_path() {
-        let args = parse(&["--train", "data/corpus.txt"]).unwrap();
-
-        assert_eq!(args.train, Some(PathBuf::from("data/corpus.txt")));
-    }
-
-    #[test]
-    fn parses_seed() {
-        let args = parse(&["--seed", "12345"]).unwrap();
-
-        assert_eq!(args.seed, Some(12345));
-    }
-
-    #[test]
-    fn parses_length() {
-        let args = parse(&["--length", "32"]).unwrap();
-
-        assert_eq!(args.length, Some(32));
-    }
-
-    #[test]
-    fn accepts_zero_length() {
-        let args = parse(&["--length", "0"]).unwrap();
-
-        assert_eq!(args.length, Some(0));
-    }
-
-    #[test]
-    fn parses_all_options_together() {
-        let args = parse(&[
-            "--text",
-            "abba",
-            "--train",
-            "data/corpus.txt",
-            "--seed",
-            "42",
-            "--length",
-            "10",
-        ])
-        .unwrap();
-
-        assert_eq!(args.text, Some("abba".to_string()));
-        assert_eq!(args.train, Some(PathBuf::from("data/corpus.txt")));
-        assert_eq!(args.seed, Some(42));
-        assert_eq!(args.length, Some(10));
-    }
-
-    #[test]
-    fn rejects_invalid_seed() {
-        let result = parse(&["--seed", "abc"]);
-
-        assert_eq!(
-            result,
-            Err(CliArgsError::InvalidValue {
-                arg: "seed",
-                value: "abc".to_string(),
-                expected: "u64",
-            })
-        );
-    }
-
-    #[test]
-    fn rejects_invalid_length() {
-        let result = parse(&["--length", "abc"]);
-
-        assert_eq!(
-            result,
-            Err(CliArgsError::InvalidValue {
-                arg: "length",
-                value: "abc".to_string(),
-                expected: "usize",
-            })
-        );
-    }
-
-    #[test]
-    fn rejects_missing_seed_value() {
-        assert_eq!(parse(&["--seed"]), Err(CliArgsError::MissingValue("seed")));
-    }
-
-    #[test]
-    fn rejects_missing_length_value() {
-        assert_eq!(
-            parse(&["--length"]),
-            Err(CliArgsError::MissingValue("length"))
-        );
-    }
-
-    #[test]
-    fn rejects_unknown_argument() {
-        assert_eq!(
-            parse(&["--unknown"]),
-            Err(CliArgsError::UnknownArg("--unknown".to_string()))
-        );
-    }
-
-    #[test]
-    fn help_returns_usage() {
-        assert_eq!(parse(&["--help"]), Err(CliArgsError::Usage));
-        assert_eq!(parse(&["-h"]), Err(CliArgsError::Usage));
-    }
-}
+#[path = "../tests/unit/args.rs"]
+mod tests;

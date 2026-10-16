@@ -2,11 +2,15 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
+//! Тензоры и числовые операции
+
+mod scalar;
 mod shape;
 mod storage;
 mod strides;
 mod tensor;
 
+pub use scalar::{ArithmeticError, Scalar, ScalarAdd, ScalarDiv, ScalarMul, ScalarNeg, ScalarSub};
 pub use shape::{Shape, ShapeError};
 pub use storage::Storage;
 pub use strides::{Strides, StridesError};
