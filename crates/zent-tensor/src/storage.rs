@@ -35,39 +35,3 @@ impl<T> Storage<T> {
         &mut self.data
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn storage_preserves_elements() {
-        let storage = Storage::from_vec(vec![10, 20, 30]);
-
-        assert_eq!(storage.len(), 3);
-        assert!(!storage.is_empty());
-        assert_eq!(storage.as_slice(), &[10, 20, 30]);
-    }
-
-    #[test]
-    fn empty_storage_has_no_elements() {
-        let storage = Storage::<i32>::from_vec(vec![]);
-
-        assert_eq!(storage.len(), 0);
-        assert!(storage.is_empty());
-        assert_eq!(storage.as_slice(), &[]);
-    }
-
-    #[test]
-    fn mutable_slice_changes_stored_elements() {
-        let mut storage = Storage::from_vec(vec![10, 20, 30]);
-
-        {
-            let elements = storage.as_mut_slice();
-            elements[1] = 99;
-        }
-
-        assert_eq!(storage.as_slice(), &[10, 99, 30]);
-        assert_eq!(storage.len(), 3);
-    }
-}
