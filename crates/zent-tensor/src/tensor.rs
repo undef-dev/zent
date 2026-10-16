@@ -108,6 +108,10 @@ impl<T> Tensor<T> {
     }
 
     /// Возвращает тензор с новой формой, при ошибке возвращает исходный
+    #[allow(
+        clippy::result_large_err,
+        reason = "Возвращаем исходный тензор без упаковки ошибки в Box"
+    )]
     pub fn into_shape(mut self, new_shape: Shape) -> Result<Self, (Self, TensorError)> {
         match self.reshape(new_shape) {
             Ok(()) => Ok(self),
