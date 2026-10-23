@@ -10,7 +10,10 @@ mod storage;
 mod strides;
 mod tensor;
 
-pub use scalar::{ArithmeticError, Scalar, ScalarAdd, ScalarDiv, ScalarMul, ScalarNeg, ScalarSub};
+pub use scalar::{
+    ArithmeticError, Scalar, ScalarAbs, ScalarAdd, ScalarDiv, ScalarExp, ScalarLn, ScalarMul,
+    ScalarNeg, ScalarPow, ScalarSqrt, ScalarSub,
+};
 pub use shape::{Shape, ShapeError};
 pub use storage::Storage;
 pub use strides::{Strides, StridesError};

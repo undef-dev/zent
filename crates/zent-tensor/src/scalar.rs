@@ -48,15 +48,43 @@ pub trait ScalarMul: Sized {
 /// Деление двух значений
 pub trait ScalarDiv: Sized {
     /// Возвращает частное; для целых округляет к нулю
-    /// Нулевой делитель у целых даёт [`ArithmeticError::DivisionByZero`]
     fn try_div(self, rhs: Self) -> Result<Self, ArithmeticError>;
 }
 
 /// Смена знака значения
 pub trait ScalarNeg: Sized {
     /// Возвращает значение с противоположным знаком
-    /// Для беззнаковых целых допустим только ноль
     fn try_neg(self) -> Result<Self, ArithmeticError>;
+}
+
+/// Возведение в степень с показателем типа `Exponent`
+pub trait ScalarPow<Exponent>: Sized {
+    /// Возвращает степень; ноль в нулевой степени даёт единицу
+    fn try_pow(self, exponent: Exponent) -> Result<Self, ArithmeticError>;
+}
+
+/// Модуль значения
+pub trait ScalarAbs: Sized {
+    /// Возвращает модуль; минимум знакового целого даёт переполнение
+    fn try_abs(self) -> Result<Self, ArithmeticError>;
+}
+
+/// Квадратный корень для чисел с плавающей точкой
+pub trait ScalarSqrt: Sized {
+    /// Возвращает квадратный корень; отрицательный аргумент даёт `NaN`
+    fn try_sqrt(self) -> Result<Self, ArithmeticError>;
+}
+
+/// Экспонента для чисел с плавающей точкой
+pub trait ScalarExp: Sized {
+    /// Возвращает `e` в степени исходного значения
+    fn try_exp(self) -> Result<Self, ArithmeticError>;
+}
+
+/// Натуральный логарифм для чисел с плавающей точкой
+pub trait ScalarLn: Sized {
+    /// Возвращает натуральный логарифм значения
+    fn try_ln(self) -> Result<Self, ArithmeticError>;
 }
 
 /// Арифметическая ошибка
@@ -76,5 +104,17 @@ impl fmt::Display for ArithmeticError {
             Self::Overflow => write!(formatter, "arithmetic overflow"),
             Self::DivisionByZero => write!(formatter, "integer division by zero"),
         }
+    }
+}
+
+impl ScalarAdd for i32 {
+    fn try_add(self, rhs: Self) -> Result<Self, ArithmeticError> {
+        self.checked_add(rhs).ok_or(ArithmeticError::Overflow)
+    }
+}
+
+impl ScalarAdd for f32 {
+    fn try_add(self, rhs: Self) -> Result<Self, ArithmeticError> {
+        Ok(self + rhs)
     }
 }
