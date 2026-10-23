@@ -81,10 +81,14 @@ impl<T> Tensor<T> {
     }
 
     /// Возвращает ошибку, если формы тензоров различаются
-    #[expect(dead_code)]
     fn ensure_same_shape<U>(&self, rhs: &Tensor<U>) -> Result<(), TensorError> {
-        let _ = rhs;
-        todo!()
+        if self.shape() != rhs.shape() {
+            return Err(TensorError::ShapeMismatch {
+                left: self.shape().clone(),
+                right: rhs.shape().clone(),
+            });
+        }
+        Ok(())
     }
 }
 

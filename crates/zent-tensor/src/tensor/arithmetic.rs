@@ -12,28 +12,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAdd,
     {
-        if self.shape() != rhs.shape() {
-            return Err(TensorError::ShapeMismatch {
-                left: self.shape().clone(),
-                right: rhs.shape().clone(),
-            });
-        }
-
-        let mut new_storage = Vec::<T>::with_capacity(self.numel());
-        self.storage
-            .as_slice()
-            .iter()
-            .zip(rhs.storage.as_slice())
-            .enumerate()
-            .try_for_each(|(index, (&a, &b))| {
-                new_storage.push(
-                    a.try_add(b)
-                        .map_err(|source| TensorError::Arithmetic { index, source })?,
-                );
-                Ok::<(), TensorError>(())
-            })?;
-
-        Self::from_vec(self.shape.clone(), new_storage)
+        self.try_zip_map(rhs, |left, right| left.try_add(right))
     }
 
     /// Поэлементно прибавляет правый тензор к текущему
@@ -136,12 +115,25 @@ impl<T: Copy> Tensor<T> {
     }
 
     /// Возвращает новый тензор, применяя операцию к парам элементов
-    #[expect(dead_code)]
-    fn try_zip_map<F>(&self, rhs: &Self, operation: F) -> Result<Self, TensorError>
+    fn try_zip_map<F>(&self, rhs: &Self, mut operation: F) -> Result<Self, TensorError>
     where
         F: FnMut(T, T) -> Result<T, ArithmeticError>,
     {
-        let _ = (rhs, operation);
-        todo!()
+        self.ensure_same_shape(rhs)?;
+
+        let mut new_storage = Vec::<T>::with_capacity(self.numel());
+        self.storage
+            .as_slice()
+            .iter()
+            .zip(rhs.storage.as_slice())
+            .enumerate()
+            .try_for_each(|(index, (&a, &b))| {
+                new_storage.push(
+                    operation(a, b).map_err(|source| TensorError::Arithmetic { index, source })?,
+                );
+                Ok::<(), TensorError>(())
+            })?;
+
+        Self::from_vec(self.shape.clone(), new_storage)
     }
 }
