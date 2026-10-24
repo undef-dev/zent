@@ -107,14 +107,132 @@ impl fmt::Display for ArithmeticError {
     }
 }
 
-impl ScalarAdd for i32 {
-    fn try_add(self, rhs: Self) -> Result<Self, ArithmeticError> {
-        self.checked_add(rhs).ok_or(ArithmeticError::Overflow)
-    }
+macro_rules! impl_scalar_pow {
+    (unsigned, $ty:ty; $($exponent:ty),+ $(,)?) => {
+        $(
+            impl ScalarPow<$exponent> for $ty {
+                fn try_pow(self, mut exponent: $exponent) -> Result<Self, ArithmeticError> {
+                    let mut base = self;
+                    let mut result = Self::ONE;
+
+                    while exponent != 0 {
+                        if exponent & 1 != 0 {
+                            result = ScalarMul::try_mul(result, base)?;
+                        }
+                        exponent >>= 1;
+                        if exponent != 0 {
+                            base = ScalarMul::try_mul(base, base)?;
+                        }
+                    }
+
+                    Ok(result)
+                }
+            }
+        )+
+    };
+    (signed, $ty:ty; $($exponent:ty),+ $(,)?) => {
+        $(
+            impl ScalarPow<$exponent> for $ty {
+                fn try_pow(self, exponent: $exponent) -> Result<Self, ArithmeticError> {
+                    let base = if exponent < 0 { Self::ONE / self } else { self };
+                    ScalarPow::try_pow(base, exponent.unsigned_abs())
+                }
+            }
+        )+
+    };
 }
 
-impl ScalarAdd for f32 {
-    fn try_add(self, rhs: Self) -> Result<Self, ArithmeticError> {
-        Ok(self + rhs)
-    }
+macro_rules! impl_scalar_int {
+    ($($ty:ty),+ $(,)?) => {
+        $(
+            impl ScalarAdd for $ty {
+                fn try_add(self, rhs: Self) -> Result<Self, ArithmeticError> {
+                    self.checked_add(rhs).ok_or(ArithmeticError::Overflow)
+                }
+            }
+
+            impl ScalarSub for $ty {
+                fn try_sub(self, rhs: Self) -> Result<Self, ArithmeticError> {
+                    self.checked_sub(rhs).ok_or(ArithmeticError::Overflow)
+                }
+            }
+
+            impl ScalarMul for $ty {
+                fn try_mul(self, rhs: Self) -> Result<Self, ArithmeticError> {
+                    self.checked_mul(rhs).ok_or(ArithmeticError::Overflow)
+                }
+            }
+
+            impl ScalarDiv for $ty {
+                fn try_div(self, rhs: Self) -> Result<Self, ArithmeticError> {
+                    self.checked_div(rhs).ok_or_else(|| {
+                        if rhs == 0 {
+                            ArithmeticError::DivisionByZero
+                        } else {
+                            ArithmeticError::Overflow
+                        }
+                    })
+                }
+            }
+
+            impl ScalarNeg for $ty {
+                fn try_neg(self) -> Result<Self, ArithmeticError> {
+                    self.checked_neg().ok_or(ArithmeticError::Overflow)
+                }
+            }
+
+            impl_scalar_pow!(unsigned, $ty; u8, u16, u32, u64, u128, usize);
+        )+
+    };
 }
+
+impl_scalar_int!(
+    i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize
+);
+
+macro_rules! impl_scalar_float {
+    ($($ty:ty),+ $(,)?) => {
+        $(
+            impl ScalarAdd for $ty {
+                fn try_add(self, rhs: Self) -> Result<Self, ArithmeticError> {
+                    Ok(self + rhs)
+                }
+            }
+
+            impl ScalarSub for $ty {
+                fn try_sub(self, rhs: Self) -> Result<Self, ArithmeticError> {
+                    Ok(self - rhs)
+                }
+            }
+
+            impl ScalarMul for $ty {
+                fn try_mul(self, rhs: Self) -> Result<Self, ArithmeticError> {
+                    Ok(self * rhs)
+                }
+            }
+
+            impl ScalarDiv for $ty {
+                fn try_div(self, rhs: Self) -> Result<Self, ArithmeticError> {
+                    Ok(self / rhs)
+                }
+            }
+
+            impl ScalarNeg for $ty {
+                fn try_neg(self) -> Result<Self, ArithmeticError> {
+                    Ok(-self)
+                }
+            }
+
+            impl_scalar_pow!(unsigned, $ty; u8, u16, u32, u64, u128, usize);
+            impl_scalar_pow!(signed, $ty; i8, i16, i32, i64, i128, isize);
+
+            impl ScalarPow<$ty> for $ty {
+                fn try_pow(self, exponent: Self) -> Result<Self, ArithmeticError> {
+                    Ok(self.powf(exponent))
+                }
+            }
+        )+
+    };
+}
+
+impl_scalar_float!(f32, f64);
