@@ -113,13 +113,17 @@ macro_rules! impl_scalar_pow {
             impl ScalarPow<$exponent> for $ty {
                 fn try_pow(self, mut exponent: $exponent) -> Result<Self, ArithmeticError> {
                     let mut base = self;
+                    // Нулевая степень сразу даст единицу
                     let mut result = Self::ONE;
 
                     while exponent != 0 {
+                        // Для нечётного показателя учитываем текущий множитель
                         if exponent & 1 != 0 {
                             result = ScalarMul::try_mul(result, base)?;
                         }
+                        // Делим показатель на два без изменения его типа
                         exponent >>= 1;
+                        // Лишний квадрат мог бы вызвать ненужное переполнение
                         if exponent != 0 {
                             base = ScalarMul::try_mul(base, base)?;
                         }
@@ -134,7 +138,9 @@ macro_rules! impl_scalar_pow {
         $(
             impl ScalarPow<$exponent> for $ty {
                 fn try_pow(self, exponent: $exponent) -> Result<Self, ArithmeticError> {
+                    // Для отрицательной степени берём обратное основание
                     let base = if exponent < 0 { Self::ONE / self } else { self };
+                    // Модуль сохраняет разрядность и корректно обрабатывает MIN
                     ScalarPow::try_pow(base, exponent.unsigned_abs())
                 }
             }
@@ -142,8 +148,25 @@ macro_rules! impl_scalar_pow {
     };
 }
 
+macro_rules! impl_scalar_abs {
+    (signed, $ty:ty) => {
+        impl ScalarAbs for $ty {
+            fn try_abs(self) -> Result<Self, ArithmeticError> {
+                self.checked_abs().ok_or(ArithmeticError::Overflow)
+            }
+        }
+    };
+    (unsigned, $ty:ty) => {
+        impl ScalarAbs for $ty {
+            fn try_abs(self) -> Result<Self, ArithmeticError> {
+                Ok(self)
+            }
+        }
+    };
+}
+
 macro_rules! impl_scalar_int {
-    ($($ty:ty),+ $(,)?) => {
+    ($kind:ident; $($ty:ty),+ $(,)?) => {
         $(
             impl ScalarAdd for $ty {
                 fn try_add(self, rhs: Self) -> Result<Self, ArithmeticError> {
@@ -182,13 +205,13 @@ macro_rules! impl_scalar_int {
             }
 
             impl_scalar_pow!(unsigned, $ty; u8, u16, u32, u64, u128, usize);
+            impl_scalar_abs!($kind, $ty);
         )+
     };
 }
 
-impl_scalar_int!(
-    i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize
-);
+impl_scalar_int!(signed; i8, i16, i32, i64, i128, isize);
+impl_scalar_int!(unsigned; u8, u16, u32, u64, u128, usize);
 
 macro_rules! impl_scalar_float {
     ($($ty:ty),+ $(,)?) => {
@@ -220,6 +243,12 @@ macro_rules! impl_scalar_float {
             impl ScalarNeg for $ty {
                 fn try_neg(self) -> Result<Self, ArithmeticError> {
                     Ok(-self)
+                }
+            }
+
+            impl ScalarAbs for $ty {
+                fn try_abs(self) -> Result<Self, ArithmeticError> {
+                    Ok(self.abs())
                 }
             }
 
