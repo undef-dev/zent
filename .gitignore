@@ -2,5 +2,5 @@
 *.zip
 /.local-context/
 /AGENTS.md
-/DEVELOPMENT_NOTES.local.md
+/DEVELOPMENT_NOTES.md
 /ROADMAP.md
