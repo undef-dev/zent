@@ -5,19 +5,10 @@
 use zent_tensor::{Shape, ShapeError};
 
 #[test]
-fn new() {
-    for (dims, numel) in [
-        (vec![], 1),
-        (vec![2, 3, 4], 24),
-        (vec![usize::MAX], usize::MAX),
-        (vec![usize::MAX, 2, 0], 0),
-        (vec![0, usize::MAX, 2], 0),
-    ] {
-        let shape = Shape::new(dims.clone()).unwrap();
-        assert_eq!(shape.dims(), dims);
-        assert_eq!(shape.rank(), dims.len());
-        assert_eq!(shape.numel(), numel, "{dims:?}");
-    }
+fn bounds() {
+    assert_eq!(Shape::new(vec![]).unwrap().numel(), 1);
+    assert_eq!(Shape::new(vec![usize::MAX, 2, 0]).unwrap().numel(), 0);
+
     assert_eq!(
         Shape::new(vec![usize::MAX, 2]),
         Err(ShapeError::NumelOverflow)

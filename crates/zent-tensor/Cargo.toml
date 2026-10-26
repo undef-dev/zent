@@ -1,6 +1,6 @@
 [package]
 name = "zent-tensor"
-version = "0.2.0"
+version = "0.3.0"
 description = "Tensor primitives for the Zent machine learning framework"
 edition = "2024"
 license-file = "../../LICENSE.md"

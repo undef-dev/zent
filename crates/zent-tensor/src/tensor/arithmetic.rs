@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::{Tensor, TensorError};
-use crate::{ArithmeticError, ScalarAdd, ScalarDiv, ScalarMul, ScalarSub};
+use crate::{ScalarAdd, ScalarDiv, ScalarMul, ScalarSub};
 
 /// Поэлементные операции
 impl<T: Copy> Tensor<T> {
@@ -20,8 +20,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAdd,
     {
-        let _ = rhs;
-        todo!()
+        self.try_zip_map_assign(rhs, |left, right| left.try_add(right))
     }
 
     /// Записывает поэлементную сумму в готовый тензор
@@ -29,8 +28,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAdd,
     {
-        let _ = (rhs, output);
-        todo!()
+        self.try_zip_map_into(rhs, output, |left, right| left.try_add(right))
     }
 
     /// Возвращает новый тензор с поэлементной разностью
@@ -38,8 +36,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSub,
     {
-        let _ = rhs;
-        todo!()
+        self.try_zip_map(rhs, |left, right| left.try_sub(right))
     }
 
     /// Поэлементно вычитает правый тензор из текущего
@@ -47,8 +44,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSub,
     {
-        let _ = rhs;
-        todo!()
+        self.try_zip_map_assign(rhs, |left, right| left.try_sub(right))
     }
 
     /// Записывает поэлементную разность в готовый тензор
@@ -56,8 +52,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSub,
     {
-        let _ = (rhs, output);
-        todo!()
+        self.try_zip_map_into(rhs, output, |left, right| left.try_sub(right))
     }
 
     /// Возвращает новый тензор с поэлементным произведением
@@ -65,8 +60,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarMul,
     {
-        let _ = rhs;
-        todo!()
+        self.try_zip_map(rhs, |left, right| left.try_mul(right))
     }
 
     /// Поэлементно умножает текущий тензор на правый
@@ -74,8 +68,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarMul,
     {
-        let _ = rhs;
-        todo!()
+        self.try_zip_map_assign(rhs, |left, right| left.try_mul(right))
     }
 
     /// Записывает поэлементное произведение в готовый тензор
@@ -83,8 +76,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarMul,
     {
-        let _ = (rhs, output);
-        todo!()
+        self.try_zip_map_into(rhs, output, |left, right| left.try_mul(right))
     }
 
     /// Возвращает новый тензор с поэлементным частным
@@ -92,8 +84,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarDiv,
     {
-        let _ = rhs;
-        todo!()
+        self.try_zip_map(rhs, |left, right| left.try_div(right))
     }
 
     /// Поэлементно делит текущий тензор на правый
@@ -101,8 +92,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarDiv,
     {
-        let _ = rhs;
-        todo!()
+        self.try_zip_map_assign(rhs, |left, right| left.try_div(right))
     }
 
     /// Записывает поэлементное частное в готовый тензор
@@ -110,30 +100,6 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarDiv,
     {
-        let _ = (rhs, output);
-        todo!()
-    }
-
-    /// Возвращает новый тензор, применяя операцию к парам элементов
-    fn try_zip_map<F>(&self, rhs: &Self, mut operation: F) -> Result<Self, TensorError>
-    where
-        F: FnMut(T, T) -> Result<T, ArithmeticError>,
-    {
-        self.ensure_same_shape(rhs)?;
-
-        let mut new_storage = Vec::<T>::with_capacity(self.numel());
-        self.storage
-            .as_slice()
-            .iter()
-            .zip(rhs.storage.as_slice())
-            .enumerate()
-            .try_for_each(|(index, (&a, &b))| {
-                new_storage.push(
-                    operation(a, b).map_err(|source| TensorError::Arithmetic { index, source })?,
-                );
-                Ok::<(), TensorError>(())
-            })?;
-
-        Self::from_vec(self.shape.clone(), new_storage)
+        self.try_zip_map_into(rhs, output, |left, right| left.try_div(right))
     }
 }

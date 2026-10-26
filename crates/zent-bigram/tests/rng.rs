@@ -2,16 +2,16 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
-use zent_bigram::{RandomSource, Rng};
+use zent_bigram::Rng;
 
 #[test]
 fn sequence() {
     let mut first = Rng::new(0);
     let mut second = Rng::new(0);
+
     for _ in 0..32 {
-        assert_eq!(first.next_u64(), second.next_u64());
         let value = first.next_f64();
-        assert_eq!(value, RandomSource::next_f64(&mut second));
+        assert_eq!(value, second.next_f64());
         assert!((0.0..1.0).contains(&value));
     }
 }

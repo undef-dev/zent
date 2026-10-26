@@ -5,6 +5,7 @@
 mod arithmetic;
 mod error;
 mod index;
+mod map;
 mod power;
 mod reshape;
 mod scalar;

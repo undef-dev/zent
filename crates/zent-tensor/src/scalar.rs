@@ -252,6 +252,24 @@ macro_rules! impl_scalar_float {
                 }
             }
 
+            impl ScalarSqrt for $ty {
+                fn try_sqrt(self) -> Result<Self, ArithmeticError> {
+                    Ok(self.sqrt())
+                }
+            }
+
+            impl ScalarExp for $ty {
+                fn try_exp(self) -> Result<Self, ArithmeticError> {
+                    Ok(self.exp())
+                }
+            }
+
+            impl ScalarLn for $ty {
+                fn try_ln(self) -> Result<Self, ArithmeticError> {
+                    Ok(self.ln())
+                }
+            }
+
             impl_scalar_pow!(unsigned, $ty; u8, u16, u32, u64, u128, usize);
             impl_scalar_pow!(signed, $ty; i8, i16, i32, i64, i128, isize);
 

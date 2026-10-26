@@ -12,8 +12,7 @@ impl<T: Copy> Tensor<T> {
         T: ScalarPow<Exponent>,
         Exponent: Copy,
     {
-        let _ = exponents;
-        todo!()
+        self.try_zip_map(exponents, |base, exponent| base.try_pow(exponent))
     }
 
     /// Возводит элементы в степени из правого тензора
@@ -25,8 +24,7 @@ impl<T: Copy> Tensor<T> {
         T: ScalarPow<Exponent>,
         Exponent: Copy,
     {
-        let _ = exponents;
-        todo!()
+        self.try_zip_map_assign(exponents, |base, exponent| base.try_pow(exponent))
     }
 
     /// Записывает поэлементные степени в готовый тензор
@@ -39,8 +37,7 @@ impl<T: Copy> Tensor<T> {
         T: ScalarPow<Exponent>,
         Exponent: Copy,
     {
-        let _ = (exponents, output);
-        todo!()
+        self.try_zip_map_into(exponents, output, |base, exponent| base.try_pow(exponent))
     }
 
     /// Возвращает новый тензор, возводя элементы в одну степень
@@ -49,8 +46,7 @@ impl<T: Copy> Tensor<T> {
         T: ScalarPow<Exponent>,
         Exponent: Copy,
     {
-        let _ = exponent;
-        todo!()
+        self.try_map(|base| base.try_pow(exponent))
     }
 
     /// Возводит все элементы в одну степень
@@ -59,8 +55,7 @@ impl<T: Copy> Tensor<T> {
         T: ScalarPow<Exponent>,
         Exponent: Copy,
     {
-        let _ = exponent;
-        todo!()
+        self.try_map_assign(|base| base.try_pow(exponent))
     }
 
     /// Записывает степени с общим показателем в готовый тензор
@@ -73,7 +68,6 @@ impl<T: Copy> Tensor<T> {
         T: ScalarPow<Exponent>,
         Exponent: Copy,
     {
-        let _ = (exponent, output);
-        todo!()
+        self.try_map_into(output, |base| base.try_pow(exponent))
     }
 }

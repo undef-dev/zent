@@ -11,7 +11,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarNeg,
     {
-        todo!()
+        self.try_map(ScalarNeg::try_neg)
     }
 
     /// Возвращает новый тензор с модулями элементов
@@ -19,7 +19,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAbs,
     {
-        todo!()
+        self.try_map(ScalarAbs::try_abs)
     }
 
     /// Заменяет элементы их модулями
@@ -27,7 +27,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAbs,
     {
-        todo!()
+        self.try_map_assign(ScalarAbs::try_abs)
     }
 
     /// Записывает модули элементов в готовый тензор
@@ -35,8 +35,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAbs,
     {
-        let _ = output;
-        todo!()
+        self.try_map_into(output, ScalarAbs::try_abs)
     }
 
     /// Возвращает новый тензор с квадратными корнями элементов
@@ -44,7 +43,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSqrt,
     {
-        todo!()
+        self.try_map(ScalarSqrt::try_sqrt)
     }
 
     /// Заменяет элементы их квадратными корнями
@@ -52,7 +51,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSqrt,
     {
-        todo!()
+        self.try_map_assign(ScalarSqrt::try_sqrt)
     }
 
     /// Записывает квадратные корни элементов в готовый тензор
@@ -60,8 +59,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSqrt,
     {
-        let _ = output;
-        todo!()
+        self.try_map_into(output, ScalarSqrt::try_sqrt)
     }
 
     /// Возвращает новый тензор с экспонентами элементов
@@ -69,7 +67,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarExp,
     {
-        todo!()
+        self.try_map(ScalarExp::try_exp)
     }
 
     /// Заменяет элементы их экспонентами
@@ -77,7 +75,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarExp,
     {
-        todo!()
+        self.try_map_assign(ScalarExp::try_exp)
     }
 
     /// Записывает экспоненты элементов в готовый тензор
@@ -85,8 +83,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarExp,
     {
-        let _ = output;
-        todo!()
+        self.try_map_into(output, ScalarExp::try_exp)
     }
 
     /// Возвращает новый тензор с натуральными логарифмами элементов
@@ -94,7 +91,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarLn,
     {
-        todo!()
+        self.try_map(ScalarLn::try_ln)
     }
 
     /// Заменяет элементы их натуральными логарифмами
@@ -102,7 +99,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarLn,
     {
-        todo!()
+        self.try_map_assign(ScalarLn::try_ln)
     }
 
     /// Записывает натуральные логарифмы элементов в готовый тензор
@@ -110,7 +107,6 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarLn,
     {
-        let _ = output;
-        todo!()
+        self.try_map_into(output, ScalarLn::try_ln)
     }
 }

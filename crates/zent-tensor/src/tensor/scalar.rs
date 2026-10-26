@@ -11,8 +11,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAdd,
     {
-        let _ = value;
-        todo!()
+        self.try_map(|element| element.try_add(value))
     }
 
     /// Прибавляет число к каждому элементу
@@ -20,8 +19,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAdd,
     {
-        let _ = value;
-        todo!()
+        self.try_map_assign(|element| element.try_add(value))
     }
 
     /// Записывает суммы элементов с числом в готовый тензор
@@ -29,8 +27,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarAdd,
     {
-        let _ = (value, output);
-        todo!()
+        self.try_map_into(output, |element| element.try_add(value))
     }
 
     /// Возвращает новый тензор, вычитая число из каждого элемента
@@ -38,8 +35,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSub,
     {
-        let _ = value;
-        todo!()
+        self.try_map(|element| element.try_sub(value))
     }
 
     /// Вычитает число из каждого элемента
@@ -47,8 +43,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSub,
     {
-        let _ = value;
-        todo!()
+        self.try_map_assign(|element| element.try_sub(value))
     }
 
     /// Записывает разности элементов и числа в готовый тензор
@@ -56,8 +51,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarSub,
     {
-        let _ = (value, output);
-        todo!()
+        self.try_map_into(output, |element| element.try_sub(value))
     }
 
     /// Возвращает новый тензор, умножая каждый элемент на число
@@ -65,8 +59,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarMul,
     {
-        let _ = value;
-        todo!()
+        self.try_map(|element| element.try_mul(value))
     }
 
     /// Умножает каждый элемент на число
@@ -74,8 +67,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarMul,
     {
-        let _ = value;
-        todo!()
+        self.try_map_assign(|element| element.try_mul(value))
     }
 
     /// Записывает произведения элементов и числа в готовый тензор
@@ -83,8 +75,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarMul,
     {
-        let _ = (value, output);
-        todo!()
+        self.try_map_into(output, |element| element.try_mul(value))
     }
 
     /// Возвращает новый тензор, деля каждый элемент на число
@@ -92,8 +83,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarDiv,
     {
-        let _ = value;
-        todo!()
+        self.try_map(|element| element.try_div(value))
     }
 
     /// Делит каждый элемент на число
@@ -101,8 +91,7 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarDiv,
     {
-        let _ = value;
-        todo!()
+        self.try_map_assign(|element| element.try_div(value))
     }
 
     /// Записывает частные элементов и числа в готовый тензор
@@ -110,7 +99,6 @@ impl<T: Copy> Tensor<T> {
     where
         T: ScalarDiv,
     {
-        let _ = (value, output);
-        todo!()
+        self.try_map_into(output, |element| element.try_div(value))
     }
 }
