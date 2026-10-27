@@ -1,6 +1,6 @@
 [package]
 name = "zent-bigram"
-version = "0.1.0"
+version = "0.2.0"
 description = "A character-level bigram language model and CLI"
 edition = "2024"
 license-file = "../../LICENSE.md"
@@ -16,3 +16,4 @@ name = "zent"
 path = "src/main.rs"
 
 [dependencies]
+zent-random = { version = "0.1.0", path = "../zent-random" }

@@ -2,5 +2,6 @@
 resolver = "3"
 members = [
     "crates/zent-bigram",
+    "crates/zent-random",
     "crates/zent-tensor",
 ]

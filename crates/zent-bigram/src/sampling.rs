@@ -9,7 +9,7 @@ const EPSILON: f64 = 1e-12;
 
 /// Выбирает индекс по вероятностям
 ///
-/// Требует непустой срез, `random` в `[0, 1)` и вероятности в `[0, 1]`.
+/// Требует непустой срез, `random` в `0.0..1.0` и вероятности в `0.0..=1.0`
 /// Сумма должна отличаться от 1 меньше чем на `1e-12`, иначе возвращается ошибка.
 pub fn sample_index(probabilities: &[f64], random: f64) -> Result<usize, SamplingError> {
     if probabilities.is_empty() {
@@ -51,7 +51,7 @@ pub enum SamplingError {
     /// Недопустимая вероятность
     InvalidProbability { index: usize, value: f64 },
 
-    /// Случайное число вне `[0, 1)`
+    /// Случайное число вне диапазона `0.0..1.0`
     InvalidRandomValue(f64),
 
     /// Недопустимая сумма вероятностей

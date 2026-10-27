@@ -1,0 +1,13 @@
+[package]
+name = "zent-random"
+version = "0.1.0"
+description = "Reproducible random number sources for Zent"
+edition = "2024"
+license-file = "../../LICENSE.md"
+repository = "https://github.com/undef-dev/zent"
+
+[lib]
+name = "zent_random"
+path = "src/lib.rs"
+
+[dependencies]

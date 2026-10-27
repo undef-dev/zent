@@ -11,6 +11,8 @@ mod reshape;
 mod scalar;
 mod unary;
 
+use std::iter::repeat_with;
+
 use crate::{Scalar, Shape, Storage, Strides};
 
 pub use error::TensorError;
@@ -44,6 +46,21 @@ impl<T> Tensor<T> {
     /// Создаёт тензор из формы и вектора
     pub fn from_vec(shape: Shape, values: Vec<T>) -> Result<Self, TensorError> {
         Self::new(shape, Storage::from_vec(values))
+    }
+
+    /// Создаёт тензор из значений, возвращаемых функцией
+    pub fn from_fn<F>(shape: Shape, make_value: F) -> Result<Self, TensorError>
+    where
+        F: FnMut() -> T,
+    {
+        let strides = Strides::from_shape(&shape)?;
+        let storage: Vec<_> = repeat_with(make_value).take(shape.numel()).collect();
+
+        Ok(Self {
+            shape,
+            strides,
+            storage: Storage::from_vec(storage),
+        })
     }
 
     /// Форма тензора

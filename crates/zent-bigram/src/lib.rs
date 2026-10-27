@@ -6,12 +6,11 @@
 
 mod bigram_model;
 mod bigram_stats;
-mod rng;
 mod sampling;
 mod tokenizer;
 
 pub use bigram_model::{BigramModel, BigramModelError};
 pub use bigram_stats::{BigramStats, BigramStatsError};
-pub use rng::{GOLDEN_GAMMA, MIX_MULTIPLIER_1, MIX_MULTIPLIER_2, RandomSource, Rng};
 pub use sampling::{SamplingError, sample_index};
 pub use tokenizer::{CharTokenizer, TokenId, TokenizerError};
+pub use zent_random::{GOLDEN_GAMMA, MIX_MULTIPLIER_1, MIX_MULTIPLIER_2, RandomSource, Rng};

@@ -2,8 +2,8 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::RandomSource;
 use crate::bigram_stats::{BigramStats, BigramStatsError};
-use crate::rng::RandomSource;
 use crate::sampling::{SamplingError, sample_index};
 use crate::tokenizer::TokenId;
 use std::error::Error;

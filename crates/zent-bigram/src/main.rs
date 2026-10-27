@@ -8,7 +8,6 @@ use args::{CliArgs, CliArgsError, usage};
 use std::env;
 use std::error::Error;
 use std::fs;
-use std::io::{self, Write};
 use zent_bigram::{BigramModel, BigramStats, BigramStatsError, CharTokenizer, Rng, TokenId};
 
 fn main() {
@@ -122,15 +121,4 @@ fn print_bigram_stats(
     }
 
     Ok(())
-}
-
-/// Читает строку из stdin
-#[allow(dead_code)]
-fn text_from_input() -> Result<String, io::Error> {
-    let mut input_str = String::new();
-
-    print!("> ");
-    io::stdout().flush()?;
-    io::stdin().read_line(&mut input_str)?;
-    Ok(input_str.to_string())
 }
