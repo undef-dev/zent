@@ -18,6 +18,7 @@ use crate::{Scalar, Shape, Storage, Strides};
 pub use error::TensorError;
 
 /// Тензор с собственным хранилищем
+#[derive(Debug)]
 pub struct Tensor<T> {
     shape: Shape,
     strides: Strides,

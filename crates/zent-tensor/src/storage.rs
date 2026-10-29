@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /// Владеет элементами тензора, расположенными подряд в памяти
+#[derive(Debug)]
 pub struct Storage<T> {
     data: Vec<T>,
 }
