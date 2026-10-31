@@ -2,23 +2,27 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{ArithmeticError, Shape, StridesError};
+use crate::{ArithmeticError, Shape, ShapeError, StridesError};
 use std::error::Error;
 use std::fmt;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum TensorError {
+    /// Формы тензоров не совпадают
+    ShapeMismatch { left: Shape, right: Shape },
+    /// Формы тензоров несовместимы для поэлементной операции
+    BroadcastMismatch { left: Shape, right: Shape },
+    /// Число элементов хранилища не соответствует форме
+    ElementCountMismatch { expected: usize, actual: usize },
     /// Арифметическая ошибка элемента с линейным индексом
     Arithmetic {
         index: usize,
         source: ArithmeticError,
     },
-    /// Формы тензоров не совпадают
-    ShapeMismatch { left: Shape, right: Shape },
-    /// Число элементов хранилища не соответствует форме
-    ElementCountMismatch { expected: usize, actual: usize },
     /// Не удалось вычислить шаги
     Strides(StridesError),
+    /// Не удалось создать форму тензора
+    Shape(ShapeError),
 }
 
 impl From<StridesError> for TensorError {
@@ -27,11 +31,18 @@ impl From<StridesError> for TensorError {
     }
 }
 
+impl From<ShapeError> for TensorError {
+    fn from(value: ShapeError) -> Self {
+        Self::Shape(value)
+    }
+}
+
 impl Error for TensorError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             Self::Arithmetic { source, .. } => Some(source),
             Self::Strides(error) => Some(error),
+            Self::Shape(error) => Some(error),
             _ => None,
         }
     }
@@ -62,6 +73,19 @@ impl fmt::Display for TensorError {
                     left.dims(),
                     right.dims()
                 )
+            }
+
+            Self::BroadcastMismatch { left, right } => {
+                write!(
+                    formatter,
+                    "tensor shapes are incompatible for broadcasting: {:?} and {:?}",
+                    left.dims(),
+                    right.dims()
+                )
+            }
+
+            Self::Shape(error) => {
+                write!(formatter, "failed to create tensor shape: {error}")
             }
         }
     }

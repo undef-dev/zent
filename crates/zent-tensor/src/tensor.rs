@@ -10,6 +10,7 @@ mod power;
 mod reshape;
 mod scalar;
 mod unary;
+mod breadcast;
 
 use std::iter::repeat_with;
 
