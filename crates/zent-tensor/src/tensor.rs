@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 mod arithmetic;
+mod broadcast;
 mod error;
 mod index;
 mod map;
@@ -10,7 +11,6 @@ mod power;
 mod reshape;
 mod scalar;
 mod unary;
-mod breadcast;
 
 use std::iter::repeat_with;
 

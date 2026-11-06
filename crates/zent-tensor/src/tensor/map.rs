@@ -2,7 +2,10 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
-use super::{Tensor, TensorError};
+use super::{
+    Tensor, TensorError,
+    broadcast::{BroadcastIndices, broadcast_shape, broadcast_strides},
+};
 use crate::ArithmeticError;
 
 impl<T: Copy> Tensor<T> {
@@ -87,23 +90,22 @@ impl<T: Copy> Tensor<T> {
     where
         F: FnMut(T, U) -> Result<T, ArithmeticError>,
     {
-        self.ensure_same_shape(rhs)?;
+        let shape = broadcast_shape(self.shape(), rhs.shape())?;
+        let left_strides = broadcast_strides(self.shape(), self.strides(), &shape);
+        let right_strides = broadcast_strides(rhs.shape(), rhs.strides(), &shape);
+        let mut values = Vec::with_capacity(shape.numel());
 
-        let mut values = Vec::with_capacity(self.numel());
-
-        self.as_slice()
-            .iter()
-            .zip(rhs.as_slice())
+        BroadcastIndices::new(&shape, &left_strides, &right_strides)
             .enumerate()
-            .try_for_each(|(index, (&left, &right))| {
+            .try_for_each(|(index, (left_index, right_index))| {
                 values.push(
-                    operation(left, right)
+                    operation(self.as_slice()[left_index], rhs.as_slice()[right_index])
                         .map_err(|source| TensorError::Arithmetic { index, source })?,
                 );
                 Ok::<(), TensorError>(())
             })?;
 
-        Self::from_vec(self.shape.clone(), values)
+        Self::from_vec(shape, values)
     }
 
     /// Меняет элементы по парам после проверки всех вычислений
@@ -115,24 +117,33 @@ impl<T: Copy> Tensor<T> {
     where
         F: FnMut(T, U) -> Result<T, ArithmeticError>,
     {
-        self.ensure_same_shape(rhs)?;
+        let shape = broadcast_shape(self.shape(), rhs.shape())?;
 
-        self.as_slice()
-            .iter()
-            .zip(rhs.as_slice())
+        if self.shape() != &shape {
+            return Err(TensorError::ShapeMismatch {
+                left: shape,
+                right: self.shape().clone(),
+            });
+        }
+
+        let left_strides = broadcast_strides(self.shape(), self.strides(), &shape);
+        let right_strides = broadcast_strides(rhs.shape(), rhs.strides(), &shape);
+
+        BroadcastIndices::new(&shape, &left_strides, &right_strides)
             .enumerate()
-            .try_for_each(|(index, (&left, &right))| {
-                operation(left, right)
+            .try_for_each(|(index, (left_index, right_index))| {
+                operation(self.as_slice()[left_index], rhs.as_slice()[right_index])
                     .map(|_| ())
                     .map_err(|source| TensorError::Arithmetic { index, source })
             })?;
 
-        self.as_mut_slice()
-            .iter_mut()
-            .zip(rhs.as_slice())
-            .for_each(|(left, &right)| {
-                *left = operation(*left, right).expect("scalar operation failed after validation");
-            });
+        BroadcastIndices::new(&shape, &left_strides, &right_strides).for_each(
+            |(left_index, right_index)| {
+                let left = &mut self.as_mut_slice()[left_index];
+                *left = operation(*left, rhs.as_slice()[right_index])
+                    .expect("scalar operation failed after validation");
+            },
+        );
 
         Ok(())
     }
@@ -147,15 +158,22 @@ impl<T: Copy> Tensor<T> {
     where
         F: FnMut(T, U) -> Result<T, ArithmeticError>,
     {
-        self.ensure_same_shape(rhs)?;
-        self.ensure_same_shape(output)?;
+        let shape = broadcast_shape(self.shape(), rhs.shape())?;
 
-        self.as_slice()
-            .iter()
-            .zip(rhs.as_slice())
+        if output.shape() != &shape {
+            return Err(TensorError::ShapeMismatch {
+                left: shape,
+                right: output.shape().clone(),
+            });
+        }
+
+        let left_strides = broadcast_strides(self.shape(), self.strides(), &shape);
+        let right_strides = broadcast_strides(rhs.shape(), rhs.strides(), &shape);
+
+        BroadcastIndices::new(&shape, &left_strides, &right_strides)
             .enumerate()
-            .try_for_each(|(index, (&left, &right))| {
-                operation(left, right)
+            .try_for_each(|(index, (left_index, right_index))| {
+                operation(self.as_slice()[left_index], rhs.as_slice()[right_index])
                     .map(|_| ())
                     .map_err(|source| TensorError::Arithmetic { index, source })
             })?;
@@ -163,9 +181,10 @@ impl<T: Copy> Tensor<T> {
         output
             .as_mut_slice()
             .iter_mut()
-            .zip(self.as_slice().iter().zip(rhs.as_slice()))
-            .for_each(|(target, (&left, &right))| {
-                *target = operation(left, right).expect("scalar operation failed after validation");
+            .zip(BroadcastIndices::new(&shape, &left_strides, &right_strides))
+            .for_each(|(target, (left_index, right_index))| {
+                *target = operation(self.as_slice()[left_index], rhs.as_slice()[right_index])
+                    .expect("scalar operation failed after validation");
             });
 
         Ok(())

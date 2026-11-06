@@ -5,7 +5,7 @@
 use super::{Tensor, TensorError};
 use crate::{ScalarAdd, ScalarDiv, ScalarMul, ScalarSub};
 
-/// Поэлементные операции
+/// Поэлементные операции с согласованием форм
 impl<T: Copy> Tensor<T> {
     /// Возвращает новый тензор с поэлементной суммой
     pub fn try_add(&self, rhs: &Self) -> Result<Self, TensorError>

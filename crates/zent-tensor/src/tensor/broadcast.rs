@@ -1,10 +1,13 @@
-#![allow(dead_code)]
+// Zent - https://github.com/undef-dev/zent
+// Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
+// SPDX-License-Identifier: Apache-2.0
 
 use crate::{
     Shape, Strides,
     TensorError::{self, BroadcastMismatch},
 };
 
+/// Перебирает индексы входных тензоров по общей форме
 pub(super) struct BroadcastIndices<'a> {
     common_dims: &'a [usize],
     left_strides: &'a [usize],
@@ -17,12 +20,54 @@ pub(super) struct BroadcastIndices<'a> {
 }
 
 impl<'a> BroadcastIndices<'a> {
+    /// Создаёт обход с первой позиции общей формы
     pub(super) fn new(
         common_shape: &'a Shape,
         left_strides: &'a [usize],
         right_strides: &'a [usize],
     ) -> Self {
-        todo!()
+        debug_assert_eq!(left_strides.len(), common_shape.rank());
+        debug_assert_eq!(right_strides.len(), common_shape.rank());
+
+        Self {
+            common_dims: common_shape.dims(),
+            left_strides,
+            right_strides,
+            coords: vec![0; common_shape.rank()],
+            left_index: 0,
+            right_index: 0,
+            remaining: common_shape.numel(),
+        }
+    }
+}
+
+impl Iterator for BroadcastIndices<'_> {
+    type Item = (usize, usize);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.remaining == 0 {
+            return None;
+        }
+
+        let indices = (self.left_index, self.right_index);
+        self.remaining -= 1;
+
+        if self.remaining > 0 {
+            for axis in (0..self.common_dims.len()).rev() {
+                if self.coords[axis] + 1 < self.common_dims[axis] {
+                    self.coords[axis] += 1;
+                    self.left_index += self.left_strides[axis];
+                    self.right_index += self.right_strides[axis];
+                    break;
+                }
+
+                self.left_index -= self.coords[axis] * self.left_strides[axis];
+                self.right_index -= self.coords[axis] * self.right_strides[axis];
+                self.coords[axis] = 0;
+            }
+        }
+
+        Some(indices)
     }
 }
 
