@@ -7,12 +7,12 @@ mod broadcast;
 mod error;
 mod index;
 mod map;
+mod matmul;
 mod power;
 mod reduce;
 mod reshape;
 mod scalar;
 mod unary;
-mod matmul;
 
 use std::iter::repeat_with;
 

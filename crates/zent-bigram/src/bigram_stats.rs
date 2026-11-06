@@ -146,7 +146,7 @@ impl fmt::Display for BigramStatsError {
             Self::TokenOutOfVocabulary { token, vocab_size } => {
                 write!(
                     formatter,
-                    "Token id `{token}` is outside vocabulary of size `{vocab_size}`"
+                    "Token `{token}` outside vocabulary (size {vocab_size})"
                 )
             }
 
@@ -158,42 +158,27 @@ impl fmt::Display for BigramStatsError {
             }
 
             Self::NoOutgoingTransitions(token) => {
-                write!(
-                    formatter,
-                    "No outgoing transitions observed for token `{token}`"
-                )
+                write!(formatter, "No outgoing transitions for token `{token}`")
             }
 
             Self::EmptyVocabulary => {
-                write!(formatter, "Vocabulary must contain at least one token")
+                write!(formatter, "Empty vocabulary")
             }
 
             Self::MatrixSizeOverflow => {
-                write!(
-                    formatter,
-                    "Bigram matrix size exceeds the maximum addressable `usize` range"
-                )
+                write!(formatter, "Matrix size exceeds usize::MAX")
             }
 
             Self::MatrixIndexOverflow => {
-                write!(
-                    formatter,
-                    "Bigram matrix index exceeds the maximum `usize` value"
-                )
+                write!(formatter, "Matrix index exceeds usize::MAX")
             }
 
             Self::TokenIndexConversionOverflow => {
-                write!(
-                    formatter,
-                    "Token id cannot be represented as `usize` on this platform"
-                )
+                write!(formatter, "Token id exceeds usize::MAX")
             }
 
             Self::OutgoingCountOverflow(token) => {
-                write!(
-                    formatter,
-                    "Total outgoing transition count overflow for token `{token}`"
-                )
+                write!(formatter, "Outgoing count overflow for token `{token}`")
             }
         }
     }

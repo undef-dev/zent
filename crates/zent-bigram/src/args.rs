@@ -168,7 +168,7 @@ impl std::fmt::Display for CliArgsError {
             } => {
                 write!(
                     formatter,
-                    "invalid value `{value}` for argument `{arg}`: expected {expected}"
+                    "invalid `{arg}` value `{value}`: expected {expected}"
                 )
             }
             Self::MissingArg(arg) => {

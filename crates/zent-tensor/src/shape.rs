@@ -55,10 +55,7 @@ impl fmt::Display for ShapeError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NumelOverflow => {
-                write!(
-                    formatter,
-                    "Number of tensor elements exceeds usize capacity"
-                )
+                write!(formatter, "element count exceeds usize::MAX")
             }
         }
     }

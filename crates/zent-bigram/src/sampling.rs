@@ -67,14 +67,11 @@ impl fmt::Display for SamplingError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::EmptyDistribution => {
-                write!(formatter, "Probability distribution must not be empty")
+                write!(formatter, "Empty probability distribution")
             }
 
             Self::InvalidRandomValue(value) => {
-                write!(
-                    formatter,
-                    "Random value `{value}` must be in the range [0.0, 1.0)"
-                )
+                write!(formatter, "Random value `{value}` outside 0.0..1.0")
             }
 
             Self::InvalidProbability { index, value } => {
@@ -85,10 +82,7 @@ impl fmt::Display for SamplingError {
             }
 
             Self::InvalidProbabilitySum(sum) => {
-                write!(
-                    formatter,
-                    "Probability distribution must sum to 1.0, got `{sum}`"
-                )
+                write!(formatter, "Expected probability sum 1.0, got `{sum}`")
             }
         }
     }

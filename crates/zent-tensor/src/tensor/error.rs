@@ -12,6 +12,8 @@ pub enum TensorError {
     ShapeMismatch { left: Shape, right: Shape },
     /// Формы тензоров несовместимы для поэлементной операции
     BroadcastMismatch { left: Shape, right: Shape },
+    /// Формы тензоров несовместимы для умножения матриц
+    MatmulMismatch { left: Shape, right: Shape },
     /// Число элементов хранилища не соответствует форме
     ElementCountMismatch { expected: usize, actual: usize },
     /// Номер оси выходит за пределы формы
@@ -56,14 +58,11 @@ impl fmt::Display for TensorError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::AxisOutOfBounds { axis, rank } => {
-                write!(
-                    formatter,
-                    "axis {axis} is out of bounds for a tensor with {rank} axes"
-                )
+                write!(formatter, "axis {axis} out of bounds for rank {rank}")
             }
 
             Self::EmptyReduction => {
-                write!(formatter, "reduction requires at least one element")
+                write!(formatter, "cannot reduce an empty group")
             }
 
             Self::Arithmetic { index, .. } => {
@@ -71,10 +70,7 @@ impl fmt::Display for TensorError {
             }
 
             Self::ElementCountMismatch { expected, actual } => {
-                write!(
-                    formatter,
-                    "tensor shape requires {expected} elements, but storage contains {actual}"
-                )
+                write!(formatter, "expected {expected} elements, got {actual}")
             }
 
             Self::Strides(_) => {
@@ -84,7 +80,7 @@ impl fmt::Display for TensorError {
             Self::ShapeMismatch { left, right } => {
                 write!(
                     formatter,
-                    "tensor shapes do not match: {:?} and {:?}",
+                    "shape mismatch: {:?} and {:?}",
                     left.dims(),
                     right.dims()
                 )
@@ -93,14 +89,23 @@ impl fmt::Display for TensorError {
             Self::BroadcastMismatch { left, right } => {
                 write!(
                     formatter,
-                    "tensor shapes are incompatible for broadcasting: {:?} and {:?}",
+                    "incompatible broadcast shapes: {:?} and {:?}",
+                    left.dims(),
+                    right.dims()
+                )
+            }
+
+            Self::MatmulMismatch { left, right } => {
+                write!(
+                    formatter,
+                    "incompatible matmul shapes: {:?} and {:?}",
                     left.dims(),
                     right.dims()
                 )
             }
 
             Self::Shape(error) => {
-                write!(formatter, "failed to create tensor shape: {error}")
+                write!(formatter, "invalid tensor shape: {error}")
             }
         }
     }

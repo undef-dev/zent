@@ -119,21 +119,15 @@ impl fmt::Display for TokenizerError {
             }
 
             Self::UnknownChar(ch) => {
-                write!(formatter, "Character `{ch}` is not present in vocabulary")
+                write!(formatter, "Unknown character `{ch}`")
             }
 
             Self::TokenIdPosOverflow => {
-                write!(
-                    formatter,
-                    "Vocabulary contains more tokens than `TokenId` can represent"
-                )
+                write!(formatter, "Vocabulary size exceeds `TokenId` capacity")
             }
 
             Self::TokenIdToUsizeOverflow => {
-                write!(
-                    formatter,
-                    "Token id cannot be represented as `usize` on this platform"
-                )
+                write!(formatter, "Token id exceeds usize::MAX")
             }
         }
     }
