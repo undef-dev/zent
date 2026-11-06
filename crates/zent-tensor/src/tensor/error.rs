@@ -14,7 +14,9 @@ pub enum TensorError {
     BroadcastMismatch { left: Shape, right: Shape },
     /// Число элементов хранилища не соответствует форме
     ElementCountMismatch { expected: usize, actual: usize },
-    /// Арифметическая ошибка элемента с линейным индексом
+    /// Номер оси выходит за пределы формы
+    AxisOutOfBounds { axis: usize, rank: usize },
+    /// Арифметическая ошибка элемента результата с линейным индексом
     Arithmetic {
         index: usize,
         source: ArithmeticError,
@@ -23,6 +25,8 @@ pub enum TensorError {
     Strides(StridesError),
     /// Не удалось создать форму тензора
     Shape(ShapeError),
+    /// Для среднего, минимума или максимума нет элементов
+    EmptyReduction,
 }
 
 impl From<StridesError> for TensorError {
@@ -51,6 +55,17 @@ impl Error for TensorError {
 impl fmt::Display for TensorError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::AxisOutOfBounds { axis, rank } => {
+                write!(
+                    formatter,
+                    "axis {axis} is out of bounds for a tensor with {rank} axes"
+                )
+            }
+
+            Self::EmptyReduction => {
+                write!(formatter, "reduction requires at least one element")
+            }
+
             Self::Arithmetic { index, .. } => {
                 write!(formatter, "arithmetic error at element {index}")
             }
