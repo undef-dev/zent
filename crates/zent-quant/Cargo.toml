@@ -1,0 +1,13 @@
+[package]
+name = "zent-quant"
+version = "0.1.0"
+description = "Quantization primitives for Zent"
+edition = "2024"
+license-file = "../../LICENSE.md"
+repository = "https://github.com/undef-dev/zent"
+
+[lib]
+name = "zent_quant"
+path = "src/lib.rs"
+
+[dependencies]

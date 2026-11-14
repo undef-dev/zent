@@ -3,11 +3,22 @@
 version = 4
 
 [[package]]
+name = "zent-autograd"
+version = "0.1.0"
+dependencies = [
+ "zent-tensor",
+]
+
+[[package]]
 name = "zent-bigram"
 version = "0.2.0"
 dependencies = [
  "zent-random",
 ]
+
+[[package]]
+name = "zent-quant"
+version = "0.1.0"
 
 [[package]]
 name = "zent-random"

@@ -1,7 +1,9 @@
 [workspace]
 resolver = "3"
 members = [
+    "crates/zent-autograd",
     "crates/zent-bigram",
+    "crates/zent-quant",
     "crates/zent-random",
     "crates/zent-tensor",
 ]

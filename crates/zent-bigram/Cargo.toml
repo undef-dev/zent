@@ -16,4 +16,4 @@ name = "zent"
 path = "src/main.rs"
 
 [dependencies]
-zent-random = { version = "0.1.0", path = "../zent-random" }
+zent-random = { path = "../zent-random" }
