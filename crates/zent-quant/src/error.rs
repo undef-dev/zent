@@ -2,10 +2,29 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
-//! ошибки квантования
+use std::error::Error;
+use std::fmt;
 
+/// Ошибки квантования
 #[derive(Debug, PartialEq, Eq)]
 pub enum QuantizationError {
+    /// Значение по указанному индексу не является конечным
     NonFiniteValue { index: usize },
+    /// Масштаб ненулевых значений округлился до нуля
     ScaleUnderflow,
+}
+
+impl Error for QuantizationError {}
+
+impl fmt::Display for QuantizationError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NonFiniteValue { index } => {
+                write!(formatter, "non-finite value at index {index}")
+            }
+            Self::ScaleUnderflow => {
+                write!(formatter, "quantization scale rounded to zero")
+            }
+        }
+    }
 }

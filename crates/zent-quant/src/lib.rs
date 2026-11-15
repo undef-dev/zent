@@ -2,7 +2,10 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
+//! Примитивы квантования
+
 mod error;
 pub mod int8;
 
+pub use error::QuantizationError;
 pub use int8::symmetric_scale;
