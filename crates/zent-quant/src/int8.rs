@@ -48,7 +48,7 @@ pub fn quantize(value: f32, scale: f32) -> Result<i8, QuantizationError> {
     // 2. Округляем количество шагов
     // 3. Ограничиваем код диапазоном от -127 до 127
     // 4. Переводим округлённый код из f32 в i8
-    
+
     Ok((value / scale)
         .round()
         .clamp(f32::from(i8::MAX).neg(), f32::from(i8::MAX)) as i8)
@@ -69,4 +69,15 @@ pub fn dequantize(code: i8, scale: f32) -> Result<f32, QuantizationError> {
     }
 
     Ok(restored)
+}
+
+pub fn quantize_slice(values: &[f32]) -> Result<(Vec<i8>, f32), QuantizationError> {
+    let _ = values;
+    todo!()
+}
+
+pub fn dequantize_slice(codes: &[i8], scale: f32) -> Result<Vec<f32>, QuantizationError> {
+    let _ = codes;
+    let _ = scale;
+    todo!()
 }
