@@ -8,4 +8,4 @@ mod error;
 pub mod int8;
 
 pub use error::QuantizationError;
-pub use int8::symmetric_scale;
+pub use int8::{dequantize, quantize, symmetric_scale};
