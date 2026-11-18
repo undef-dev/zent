@@ -1,6 +1,6 @@
 [package]
 name = "zent-quant"
-version = "0.2.0"
+version = "0.3.0"
 description = "Quantization primitives for Zent"
 edition = "2024"
 license-file = "../../LICENSE.md"

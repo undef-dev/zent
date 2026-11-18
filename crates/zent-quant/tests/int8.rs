@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
-use zent_quant::int8::{dequantize, quantize};
+use zent_quant::int8::{dequantize, dequantize_slice, quantize, quantize_slice};
 use zent_quant::{QuantizationError, symmetric_scale};
 
 #[test]
@@ -88,4 +88,45 @@ fn conversion_errors() {
             )
         );
     }
+}
+
+#[test]
+fn slices() {
+    let (codes, scale) = quantize_slice(&[5.0, -254.0, -5.0]).unwrap();
+    assert_eq!(scale, 2.0);
+    assert_eq!(codes, [3, -127, -3]);
+    assert_eq!(dequantize_slice(&codes, scale), Ok(vec![6.0, -254.0, -6.0]));
+
+    assert_eq!(quantize_slice(&[]), Ok((Vec::new(), 1.0)));
+    assert_eq!(quantize_slice(&[0.0, -0.0]), Ok((vec![0, 0], 1.0)));
+
+    for scale in [2.0, 0.0_f32.next_up()] {
+        assert_eq!(dequantize_slice(&[], scale), Ok(Vec::new()));
+    }
+}
+
+#[test]
+fn slice_errors() {
+    for scale in [0.0, -0.0, -1.0, f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+        assert_eq!(
+            dequantize_slice(&[], scale),
+            Err(QuantizationError::InvalidScale)
+        );
+    }
+
+    assert_eq!(
+        quantize_slice(&[5.0, f32::NAN]),
+        Err(QuantizationError::NonFiniteValue { index: 1 })
+    );
+
+    let smallest_positive = 0.0_f32.next_up();
+    assert_eq!(
+        quantize_slice(&[smallest_positive]),
+        Err(QuantizationError::ScaleUnderflow)
+    );
+
+    assert_eq!(
+        dequantize_slice(&[1, 2], f32::MAX),
+        Err(QuantizationError::NonFiniteResult)
+    );
 }

@@ -71,13 +71,32 @@ pub fn dequantize(code: i8, scale: f32) -> Result<f32, QuantizationError> {
     Ok(restored)
 }
 
+/// Квантует значения с общим масштабом и возвращает коды вместе с ним
 pub fn quantize_slice(values: &[f32]) -> Result<(Vec<i8>, f32), QuantizationError> {
-    let _ = values;
-    todo!()
+    // квантование пустого среза возвращает пустой вектор и масштаб 1.0
+    let scale = symmetric_scale(values)?;
+    let codes = values
+        .iter()
+        .map(|&value| quantize(value, scale))
+        .collect::<Result<Vec<i8>, QuantizationError>>()?;
+
+    Ok((codes, scale))
 }
 
+/// Восстанавливает значения по кодам и общему масштабу
 pub fn dequantize_slice(codes: &[i8], scale: f32) -> Result<Vec<f32>, QuantizationError> {
-    let _ = codes;
-    let _ = scale;
-    todo!()
+    // восстановление пустого среза возвращает пустой вектор при допустимом масштабе,
+    // а неправильный масштаб всегда даёт InvalidScale
+    if !(scale.is_finite() && scale > 0.0) {
+        return Err(QuantizationError::InvalidScale);
+    } else if codes.is_empty() {
+        return Ok(vec![]);
+    }
+
+    let values = codes
+        .iter()
+        .map(|&code| dequantize(code, scale))
+        .collect::<Result<Vec<f32>, QuantizationError>>()?;
+
+    Ok(values)
 }
