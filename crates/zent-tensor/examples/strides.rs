@@ -2,9 +2,10 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
+use std::error::Error;
 use zent_tensor::{Shape, Strides};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let shape = Shape::new(vec![2, 3, 4])?;
     let strides = Strides::from_shape(&shape)?;
 

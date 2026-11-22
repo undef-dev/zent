@@ -13,10 +13,11 @@ mod reduce;
 mod reshape;
 mod scalar;
 mod unary;
+mod view;
 
 use std::iter::repeat_with;
 
-use crate::{Scalar, Shape, Storage, Strides};
+use crate::{Scalar, Shape, Storage, Strides, tensor::view::TensorView};
 
 pub use error::TensorError;
 
@@ -111,6 +112,10 @@ impl<T> Tensor<T> {
             });
         }
         Ok(())
+    }
+
+    pub fn view(&self) -> TensorView<'_, T> {
+        todo!()
     }
 }
 

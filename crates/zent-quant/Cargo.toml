@@ -11,3 +11,6 @@ name = "zent_quant"
 path = "src/lib.rs"
 
 [dependencies]
+
+[dev-dependencies]
+zent-tensor = { path = "../zent-tensor" }

@@ -2,10 +2,11 @@
 // Copyright (c) 2026 Denis Plyasunov and other Zent contributors.
 // SPDX-License-Identifier: Apache-2.0
 
+use std::error::Error;
 use zent_quant::int8::{dequantize, quantize};
-use zent_quant::{QuantizationError, symmetric_scale};
+use zent_quant::symmetric_scale;
 
-fn main() -> Result<(), QuantizationError> {
+fn main() -> Result<(), Box<dyn Error>> {
     // Максимальный модуль 254 даёт масштаб: 254 / 127 = 2
     let weights = [-254.0_f32, -5.0, 0.0, 5.0, 254.0];
     let scale = symmetric_scale(&weights)?;

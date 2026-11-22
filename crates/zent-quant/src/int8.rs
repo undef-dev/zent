@@ -75,6 +75,7 @@ pub fn dequantize(code: i8, scale: f32) -> Result<f32, QuantizationError> {
 pub fn quantize_slice(values: &[f32]) -> Result<(Vec<i8>, f32), QuantizationError> {
     // квантование пустого среза возвращает пустой вектор и масштаб 1.0
     let scale = symmetric_scale(values)?;
+    
     let codes = values
         .iter()
         .map(|&value| quantize(value, scale))
