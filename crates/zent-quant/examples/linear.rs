@@ -27,7 +27,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     let quant_error = (original - restored).abs();
     let method_diff = (direct - restored).abs();
 
-    println!("Original | Restored | From i8  | Quant error | i8 vs restored");
-    println!("{original:8.6} | {restored:8.6} | {direct:8.6} | {quant_error:11.6} | {method_diff}");
+    println!("Scale: {scale:.6}");
+    println!();
+    println!(
+        "{:>8} | {:>8} | {:>8} | {:>11} | {:>14}",
+        "Original", "Restored", "From i8", "Quant error", "i8 vs restored"
+    );
+    println!("---------+----------+----------+-------------+---------------");
+    println!(
+        "{original:8.6} | {restored:8.6} | {direct:8.6} | {quant_error:11.6} | {method_diff:14.6}"
+    );
+
     Ok(())
 }

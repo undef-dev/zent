@@ -72,6 +72,33 @@ fn view() {
 }
 
 #[test]
+fn select_axis() {
+    let tensor = Tensor::from_vec(shape(&[2, 3]), vec![1, 2, 3, 4, 5, 6]).unwrap();
+    let view = tensor.view();
+
+    let row = view.select_axis(0, 1).unwrap();
+    assert_eq!(row.get(&[0]), Some(&4));
+    assert_eq!(row.get(&[1]), Some(&5));
+    assert_eq!(row.get(&[2]), Some(&6));
+
+    let column = view.select_axis(1, 1).unwrap();
+    assert_eq!(column.get(&[0]), Some(&2));
+    assert_eq!(column.get(&[1]), Some(&5));
+}
+
+#[test]
+fn as_slice() {
+    let tensor = Tensor::from_vec(shape(&[2, 3]), vec![1, 2, 3, 4, 5, 6]).unwrap();
+    let view = tensor.view();
+    let row = view.select_axis(0, 1).unwrap();
+    let column = view.select_axis(1, 1).unwrap();
+
+    assert_eq!(view.as_slice(), Some(tensor.as_slice()));
+    assert_eq!(row.as_slice(), Some(&[4, 5, 6][..]));
+    assert_eq!(column.as_slice(), None);
+}
+
+#[test]
 fn reshape() {
     #[derive(Debug, PartialEq)]
     struct Value(usize);

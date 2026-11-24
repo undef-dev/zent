@@ -46,6 +46,14 @@ impl Strides {
     pub fn as_slice(&self) -> &[usize] {
         &self.steps
     }
+
+    /// Возвращает шаги всех осей, кроме указанной
+    pub(crate) fn without_axis(&self, axis: usize) -> Self {
+        let mut steps = self.steps.clone();
+        steps.remove(axis);
+
+        Self { steps }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
