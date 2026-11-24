@@ -63,6 +63,15 @@ fn invalid_access() {
 }
 
 #[test]
+fn view() {
+    let tensor = Tensor::from_vec(shape(&[2, 3]), vec![1, 2, 3, 4, 5, 6]).unwrap();
+    let view = tensor.view();
+
+    assert_eq!(view.get(&[1, 1]), Some(&5));
+    assert_eq!(view.get(&[0, 3]), None);
+}
+
+#[test]
 fn reshape() {
     #[derive(Debug, PartialEq)]
     struct Value(usize);

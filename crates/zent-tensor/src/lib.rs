@@ -17,4 +17,4 @@ pub use scalar::{
 pub use shape::{Shape, ShapeError};
 pub use storage::Storage;
 pub use strides::{Strides, StridesError};
-pub use tensor::{Tensor, TensorError};
+pub use tensor::{Tensor, TensorError, TensorView};

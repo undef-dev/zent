@@ -17,9 +17,10 @@ mod view;
 
 use std::iter::repeat_with;
 
-use crate::{Scalar, Shape, Storage, Strides, tensor::view::TensorView};
+use crate::{Scalar, Shape, Storage, Strides};
 
 pub use error::TensorError;
+pub use view::TensorView;
 
 /// Тензор с собственным хранилищем
 #[derive(Debug)]
@@ -112,10 +113,6 @@ impl<T> Tensor<T> {
             });
         }
         Ok(())
-    }
-
-    pub fn view(&self) -> TensorView<'_, T> {
-        todo!()
     }
 }
 
