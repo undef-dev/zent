@@ -10,4 +10,4 @@ name = "zent_autograd"
 path = "src/lib.rs"
 
 [dependencies]
-zent-tensor = { path = "../zent-tensor" }
+# zent-tensor = { path = "../zent-tensor" }

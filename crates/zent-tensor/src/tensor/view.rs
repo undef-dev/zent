@@ -1,3 +1,5 @@
+use std::ops::Range;
+
 use super::Tensor;
 use crate::{Shape, Strides};
 
@@ -90,6 +92,18 @@ impl<'a, T> TensorView<'a, T> {
         // Смещение + число элементов указывает на позицию сразу за срезом
         let end = self.offset.checked_add(len)?;
         self.data.get(self.offset..end)
+    }
+
+    pub fn slice_axis(&self, axis: usize, range: Range<usize>, step: usize) -> Option<Self> {
+        // 1. Проверить ось и границы
+        // 2. Заменить один размер в shape
+        // 3. Вычислить начало и шаг
+        // 4. Собрать TensorView
+
+        let _ = step;
+        let _ = range;
+        let _ = axis;
+        todo!()
     }
 }
 
